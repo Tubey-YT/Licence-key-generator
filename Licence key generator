@@ -1,5 +1,5 @@
 @echo off
-title CoolCMD v3.0
+title CMD v3.0
 color 0A
 cls
 setlocal EnableDelayedExpansion
