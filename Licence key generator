@@ -11,7 +11,7 @@ setlocal EnableDelayedExpansion
 
 :main
 echo ================================
-echo        COOL CMD INTERFACE v3.0
+echo        CMD INTERFACE v3.0
 echo ================================
 echo Type !help for command list
 echo.
