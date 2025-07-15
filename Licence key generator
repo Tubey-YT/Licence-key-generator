@@ -1,0 +1,44 @@
+@echo off
+title License Key Generator
+color 0A
+
+:: Set how many keys to generate
+set /p numKeys=How many license keys do you want to generate? 
+
+:: Set the output file
+set "outputFile=license_keys.txt"
+
+:: Clear previous file
+> "%outputFile%" echo [License Keys Generated on %date% %time%]
+
+echo.
+echo Generating %numKeys% license keys...
+echo.
+
+:: Loop to generate keys
+for /L %%A in (1,1,%numKeys%) do (
+    call :GenerateKey >> "%outputFile%"
+)
+
+echo.
+echo Done! Keys saved to "%outputFile%"
+pause
+exit
+
+:GenerateKey
+setlocal EnableDelayedExpansion
+
+:: Format: XXXX-XXXX-XXXX-XXXX (alphanumeric)
+set "charset=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+set "key="
+
+for /L %%i in (1,1,16) do (
+    set /a index=!random! %% 36
+    for %%j in (!index!) do set "char=!charset:~%%j,1!"
+    set "key=!key!!char!"
+)
+
+:: Add dashes after every 4 characters
+echo !key:~0,4!-!key:~4,4!-!key:~8,4!-!key:~12,4!
+endlocal
+exit /b
