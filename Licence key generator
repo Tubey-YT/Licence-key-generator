@@ -1,44 +1,260 @@
 @echo off
-title License Key Generator
+title CoolCMD v3.0
 color 0A
-
-:: Set how many keys to generate
-set /p numKeys=How many license keys do you want to generate? 
-
-:: Set the output file
-set "outputFile=license_keys.txt"
-
-:: Clear previous file
-> "%outputFile%" echo [License Keys Generated on %date% %time%]
-
-echo.
-echo Generating %numKeys% license keys...
-echo.
-
-:: Loop to generate keys
-for /L %%A in (1,1,%numKeys%) do (
-    call :GenerateKey >> "%outputFile%"
-)
-
-echo.
-echo Done! Keys saved to "%outputFile%"
-pause
-exit
-
-:GenerateKey
+cls
 setlocal EnableDelayedExpansion
 
-:: Format: XXXX-XXXX-XXXX-XXXX (alphanumeric)
-set "charset=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-set "key="
+:: Ensure all logs exist
+(for %%f in (accounts.txt license_keys.txt ips.txt passwords.txt) do (
+    if not exist %%f echo [%%~nf Log] > %%f
+))
 
-for /L %%i in (1,1,16) do (
-    set /a index=!random! %% 36
-    for %%j in (!index!) do set "char=!charset:~%%j,1!"
-    set "key=!key!!char!"
+:main
+echo ================================
+echo        COOL CMD INTERFACE v3.0
+echo ================================
+echo Type !help for command list
+echo.
+
+:loop
+set /p cmd=^> 
+:: Core Commands
+if "%cmd%"=="!help" goto help
+if "%cmd%"=="!accgen" goto accgen
+if "%cmd%"=="!keygen" goto keygen
+if "%cmd%"=="!ipgen" goto ipgen
+if "%cmd%"=="!passgen" goto passgen
+if "%cmd%"=="!joke" goto joke
+if "%cmd%"=="!quote" goto quote
+if "%cmd%"=="!weather" goto weather
+if "%cmd%"=="!hackmode" goto hackmode
+if "%cmd%"=="!timer" goto timer
+if "%cmd%"=="!calc" goto calc
+if "%cmd%"=="!about" goto about
+if "%cmd%"=="!credits" goto credits
+if "%cmd%"=="!filegen" goto filegen
+if "%cmd%"=="!rps" goto rps
+if "%cmd%"=="!encrypt" goto encrypt
+if /i "!cmd:~0,7!"=="!ascii " set "text=!cmd:~7!" & goto ascii
+
+:: View/Clear Logs
+if "%cmd%"=="!view accs" start notepad accounts.txt & goto loop
+if "%cmd%"=="!clear accs" echo [Accounts Log] > accounts.txt & echo Cleared. & goto loop
+if "%cmd%"=="!view keys" start notepad license_keys.txt & goto loop
+if "%cmd%"=="!clear keys" echo [License Keys Log] > license_keys.txt & echo Cleared. & goto loop
+if "%cmd%"=="!view ips" start notepad ips.txt & goto loop
+if "%cmd%"=="!clear ips" echo [IP Generator Log] > ips.txt & echo Cleared. & goto loop
+if "%cmd%"=="!view passes" start notepad passwords.txt & goto loop
+if "%cmd%"=="!clear passes" echo [Passwords Log] > passwords.txt & echo Cleared. & goto loop
+if "%cmd%"=="!clear all" (
+    echo [Accounts Log] > accounts.txt
+    echo [License Keys Log] > license_keys.txt
+    echo [IP Generator Log] > ips.txt
+    echo [Passwords Log] > passwords.txt
+    echo All logs cleared!
+    goto loop
 )
 
-:: Add dashes after every 4 characters
-echo !key:~0,4!-!key:~4,4!-!key:~8,4!-!key:~12,4!
-endlocal
-exit /b
+if "%cmd%"=="!exit" exit
+echo Unknown command: %cmd%
+goto loop
+
+:help
+echo.
+echo --- GENERATORS ---
+echo !accgen           - Generate account
+echo !keygen           - Generate license key
+echo !ipgen            - Generate fake IP
+echo !passgen          - Generate password
+echo !filegen          - Create random files
+echo.
+echo --- FUN STUFF ---
+echo !ascii [text]     - Text to ASCII
+echo !rps              - Rock Paper Scissors
+echo !joke             - Tech joke
+echo !quote            - Motivation
+echo !weather          - Fake forecast
+echo !hackmode         - Matrix hacking
+echo !timer            - Countdown
+echo !calc             - Simple calculator
+echo !encrypt          - Fake password encryption
+echo.
+echo --- FILE COMMANDS ---
+echo !view accs/keys/ips/passes
+echo !clear accs/keys/ips/passes/all
+echo.
+echo --- SYSTEM ---
+echo !about            - Info
+echo !credits          - Credits
+echo !exit             - Exit
+echo.
+goto loop
+
+:accgen
+set user=User%random%
+set pass=Pass!%random%
+echo Username: %user%
+echo Password: %pass%
+echo Username: %user% ^| Password: %pass% >> accounts.txt
+echo.
+goto loop
+
+:keygen
+set key=%random:~-4%-%random:~-4%-%random:~-4%-%random:~-4%
+echo License Key: %key%
+echo %key% >> license_keys.txt
+echo.
+goto loop
+
+:ipgen
+set /a ip1=%random%%%255
+set /a ip2=%random%%%255
+set /a ip3=%random%%%255
+set /a ip4=%random%%%255
+echo IP: %ip1%.%ip2%.%ip3%.%ip4%
+echo %ip1%.%ip2%.%ip3%.%ip4% >> ips.txt
+echo.
+goto loop
+
+:passgen
+set "chars=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$"
+set "pass="
+for /L %%i in (1,1,10) do (
+    set /a rnd=!random! %% 66
+    set "pass=!pass!!chars:~%rnd%,1!"
+)
+echo Password: !pass!
+echo !pass! >> passwords.txt
+echo.
+goto loop
+
+:joke
+set /a j=%random%%%5
+if %j%==0 echo I told my computer I needed a break. It said "No problem, I'll go to sleep."
+if %j%==1 echo Why do coders prefer dark mode? Because light attracts bugs.
+if %j%==2 echo What’s a computer’s favorite snack? Microchips.
+if %j%==3 echo I would tell a UDP joke, but you might not get it.
+if %j%==4 echo Debugging: Being the detective in a crime you committed.
+echo.
+goto loop
+
+:quote
+set /a q=%random%%%4
+if %q%==0 echo "Stay hungry, stay foolish." – Steve Jobs
+if %q%==1 echo "Talk is cheap. Show me the code." – Linus Torvalds
+if %q%==2 echo "First, solve the problem. Then, write the code." – Wirth
+if %q%==3 echo "Simplicity is the soul of efficiency." – Freeman
+echo.
+goto loop
+
+:weather
+set citylist=Tokyo Paris London Chicago Dubai Miami Berlin
+set /a c=%random%%%7
+for /f "tokens=%c%" %%i in ("!citylist!") do set city=%%i
+set /a temp=15 + %random%%%20
+set /a cond=%random%%%3
+if %cond%==0 set cond=Sunny
+if %cond%==1 set cond=Cloudy
+if %cond%==2 set cond=Rainy
+echo Weather for %city%: %temp%C, %cond%
+echo.
+goto loop
+
+:hackmode
+cls
+echo [Entering HACK MODE...]
+timeout /t 1 >nul
+color 0A
+for /L %%i in (1,1,50) do (
+    echo !random!!random!!random!!random!
+)
+echo Done.
+goto loop
+
+:timer
+set /p t=Seconds: 
+echo Timer started...
+:tick
+ping -n 2 localhost >nul
+set /a t=%t%-1
+if %t% leq 0 (
+    echo Time's up!
+) else (
+    echo %t%...
+    goto tick
+)
+echo.
+goto loop
+
+:calc
+set /p expr=Math: 
+set /a result=%expr%
+echo Result: %result%
+echo.
+goto loop
+
+:ascii
+echo.
+echo ---------- ASCII ----------
+echo !text!
+echo --------------------------
+echo.
+goto loop
+
+:filegen
+set /a num=%random%%%5 + 1
+for /L %%i in (1,1,!num!) do (
+    set /a size=100 + !random! %% 300
+    set "fname=DummyFile_%%i_!random!.txt"
+    fsutil file createnew "!fname!" !size! >nul
+    echo Created !fname! (!size! bytes)
+)
+echo.
+goto loop
+
+:rps
+set /p choice=Choose [rock/paper/scissors]: 
+set /a bot=%random%%%3
+if %bot%==0 set bot=rock
+if %bot%==1 set bot=paper
+if %bot%==2 set bot=scissors
+echo Bot chose: %bot%
+if "%choice%"=="%bot%" echo It's a tie!
+if "%choice%"=="rock" if "%bot%"=="scissors" echo You win!
+if "%choice%"=="rock" if "%bot%"=="paper" echo You lose!
+if "%choice%"=="paper" if "%bot%"=="rock" echo You win!
+if "%choice%"=="paper" if "%bot%"=="scissors" echo You lose!
+if "%choice%"=="scissors" if "%bot%"=="paper" echo You win!
+if "%choice%"=="scissors" if "%bot%"=="rock" echo You lose!
+echo.
+goto loop
+
+:encrypt
+set /p toenc=Enter text to encrypt: 
+set "enc="
+for /L %%i in (0,1,100) do (
+    set "ch=!toenc:~%%i,1!"
+    if "!ch!"=="" goto showenc
+    call set /a hex=0x!ch!
+    for /f %%H in ('"cmd /u /c echo(!ch!|findstr /R ."') do (
+        set "enc=!enc!%%H "
+    )
+)
+:showenc
+echo.
+echo Encrypted (hex): !enc!
+echo.
+goto loop
+
+:about
+echo CoolCMD v3.0 – Batch-powered toolkit of generators, games & fun
+echo Extend it yourself! Add any command you want.
+echo.
+goto loop
+
+:credits
+echo Made by ChatGPT (OpenAI)
+echo Tools: Windows CMD, Batch Scripting
+echo You rock for using this. 🚀
+echo.
+goto loop
